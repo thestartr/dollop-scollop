@@ -22,10 +22,18 @@ app.set('port', port);
 var server = http.createServer(app);
 var io = require('socket.io')(server);
 
-io.on('connection', function(socket) {
-  console.log(socket.id);
+io.on('connection', newConnection);
+
+function newConnection(socket) {
+  console.log('New connection ' + socket.id);
+
+  socket.on('mouse', mouseMsg);
+  socket.broudcast;
   socket.on('disconnect', reason => {});
-});
+  function mouseMsg(data) {
+    socket.broadcast.emit('mouse', data);
+  }
+}
 
 /**
  * Listen on provided port, on all network interfaces.

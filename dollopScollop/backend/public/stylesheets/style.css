@@ -6,6 +6,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: #eee;
   color: #444;
+  height:100vh;
 }
 
 .wrapper {
