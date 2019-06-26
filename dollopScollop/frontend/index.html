@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Dollop Scollop</title>
+    <style>
+      body {
+        margin: 0;
+
+        font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+          monospace;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #eee;
+        color: #444;
+      }
+
+      .wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      canvas {
+        background: #fff;
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Welcome to Dollp Scollop</h1>
+        <p>Play nice with others</p>
+      </header>
+      <main>
+        <div class="c-dollopScollp c-dollopScollp__container">
+          <canvas
+            id="c-dollopScollop__canvas"
+            width="500px"
+            height="500px"
+          ></canvas>
+        </div>
+      </main>
+      <footer></footer>
+    </div>
+    <script src="assets/js/index.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io('http://localhost/9000');
+    </script>
+  </body>
+</html>
