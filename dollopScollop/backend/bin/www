@@ -7,6 +7,12 @@
 var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
+const redis = require('redis');
+const client = redis.createClient(
+  6379,
+  'dollop-scollop.redis.cache.windows.net',
+  { auth_pass: 'OXPysj73RzCOqaxaczbzOTgOQcNELroChnzmvRO2kH4=' }
+);
 
 /**
  * Get port from environment and store in Express.
@@ -29,9 +35,14 @@ function newConnection(socket) {
 
   socket.on('mouse', mouseMsg);
   socket.broudcast;
-  socket.on('disconnect', reason => {});
+  socket.on('disconnect', reason => {
+    console.log(reason);
+  });
+
+
   function mouseMsg(data) {
     socket.broadcast.emit('mouse', data);
+    client.set(, JSON.stringify(data), redis.print);
   }
 }
 
