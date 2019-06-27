@@ -3,8 +3,10 @@
 
   const canvasContainer = document.querySelector('.c-dollopScollop__container');
   // const ctx = canvas.getContext('2d');
-  var socket = io();
+  const socket = io();
   let isDrawing = false;
+  let mousePos = { x: 0, y: 0 };
+  let lastPos = mousePos;
 
   // functions
   function createCanvas(parentContainer, canvasWidth, canvasHeight, canvasID) {
@@ -19,12 +21,15 @@
 
   socket.on('mouse', newDrawing);
   function newDrawing(data) {
+    console.log(data);
+    ctx.lineJoin = ctx.lineCap = 'round';
     ctx.strokeStyle = '#' + (((1 << 24) * Math.random()) | 0).toString(16);
     ctx.beginPath();
     ctx.lineWidth = 10;
+    ctx.moveTo(data.prevX, data.prevY);
     ctx.lineTo(data.x, data.y);
     ctx.stroke();
-    ctx.closePath();
+    // ctx.closePath();
   }
 
   function getMousePos(canvas, evt) {
@@ -37,29 +42,30 @@
 
   function getCanvasPosition(e) {
     isDrawing = true;
-    ctx.lineWidth = 10;
-
+    ctx.lineWidth = 5;
     ctx.lineJoin = ctx.lineCap = 'round';
-
-    let mouseCoords = getMousePos(canvas, e);
-    ctx.moveTo(mouseCoords.x, mouseCoords.y);
+    lastPos = getMousePos(canvas, e);
   }
 
   function mouseDragged(e) {
     let mouseCoords = getMousePos(canvas, e);
-
+    mousePos = mouseCoords;
     if (isDrawing) {
       let data = {
         x: mouseCoords.x,
-        y: mouseCoords.y
+        y: mouseCoords.y,
+        prevX: lastPos.x,
+        prevY: lastPos.y
       };
 
       socket.emit('mouse', data);
       ctx.strokeStyle = '#000';
       ctx.beginPath();
+      ctx.moveTo(lastPos.x, lastPos.y);
       ctx.lineTo(mouseCoords.x, mouseCoords.y);
       ctx.stroke();
-      ctx.closePath();
+      // ctx.closePath();
+      lastPos = mousePos;
     }
   }
 
@@ -80,6 +86,6 @@
   canvas.addEventListener('mouseup', () => (isDrawing = false));
 })();
 
-//TODO: fill line gaps
+//TODO: convert lineto to bezier curves
+//TODO: fix going off
 //TODO: allow selection of colour from user
-//TODO: set mouse position from socket users
