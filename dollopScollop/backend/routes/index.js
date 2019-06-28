@@ -18,16 +18,14 @@ client.on('error', function(err) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-
-
-  // client.get('KEYS', function(error, result) {
-  //   if (error) {
-  //     console.log(error);
-  //     throw error;
-  //   }
-  //   // const resultObj = JSON.parse(result);
-  //   console.log('GET result ->' + result);
-  });
+  // // client.get('KEYS', function(error, result) {
+  // //   if (error) {
+  // //     console.log(error);
+  // //     throw error;
+  // //   }
+  // //   // const resultObj = JSON.parse(result);
+  // //   console.log('GET result ->' + result);
+  // });
   res.render('index', { title: 'Express' });
 });
 

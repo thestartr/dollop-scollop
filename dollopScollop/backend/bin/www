@@ -31,7 +31,29 @@ var io = require('socket.io')(server);
 io.on('connection', newConnection);
 
 function newConnection(socket) {
+  const newCanvas = [];
   console.log('New connection ' + socket.id);
+  client.keys('*', function(err, keys) {
+    if (err) return console.log(err);
+
+    for (var i = 0, len = keys.length; i < len; i++) {
+      console.log(
+        keys.length,
+        client.get(keys[i], function(error, result) {
+          if (error) {
+            console.log(error);
+            throw error;
+          }
+          Array.push(JSON.parse(result));
+        })
+      );
+    }
+
+    socket.emit(newCanvas);
+  });
+  // client.flushdb(function(err, succeeded) {
+  //   console.log(succeeded); // will be true if successfull
+  // });
 
   socket.on('mouse', mouseMsg);
   socket.broudcast;
@@ -39,10 +61,15 @@ function newConnection(socket) {
     console.log(reason);
   });
 
-
   function mouseMsg(data) {
     socket.broadcast.emit('mouse', data);
-    client.set(, JSON.stringify(data), redis.print);
+    client.set(
+      `${new Date().getTime()}_canvasData`,
+      JSON.stringify(data),
+      'EX',
+      600,
+      redis.print
+    );
   }
 }
 
