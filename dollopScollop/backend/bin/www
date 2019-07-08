@@ -4,69 +4,69 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('backend:server');
-var http = require('http');
-const redis = require('redis');
+var app = require("../app");
+var debug = require("debug")("backend:server");
+var http = require("http");
+const redis = require("redis");
 const client = redis.createClient(
   6379,
-  'dollop-scollop.redis.cache.windows.net',
-  { auth_pass: 'OXPysj73RzCOqaxaczbzOTgOQcNELroChnzmvRO2kH4=' }
+  "dollop-scollop.redis.cache.windows.net",
+  {
+    auth_pass: "OXPysj73RzCOqaxaczbzOTgOQcNELroChnzmvRO2kH4="
+  }
 );
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '9000');
-app.set('port', port);
+var port = normalizePort(process.env.PORT || "9000");
+app.set("port", port);
 
 /**
  * Create HTTP server.
  */
 
 var server = http.createServer(app);
-var io = require('socket.io')(server);
+var io = require("socket.io")(server);
 
-io.on('connection', newConnection);
+io.on("connection", newConnection);
 
 function newConnection(socket) {
-  const newCanvas = [];
-  console.log('New connection ' + socket.id);
-  client.keys('*', function(err, keys) {
+  var newCanvas = [];
+  console.log("New connection " + socket.id);
+  client.keys("*", (err, keys) => {
     if (err) return console.log(err);
-
+    // console.log(keys.length);
     for (var i = 0, len = keys.length; i < len; i++) {
-      console.log(
-        keys.length,
-        client.get(keys[i], function(error, result) {
-          if (error) {
-            console.log(error);
-            throw error;
-          }
-          Array.push(JSON.parse(result));
-        })
-      );
-    }
+      client.get(keys[i], (error, result) => {
+        if (error) {
+          console.log(error);
+          throw error;
+        }
 
-    socket.emit(newCanvas);
+        newCanvas.push(result);
+      });
+    }
+    socket.emit("newCanvas", newCanvas);
   });
-  // client.flushdb(function(err, succeeded) {
+
+  // client.flushdb(function (err, succeeded) {
   //   console.log(succeeded); // will be true if successfull
   // });
 
-  socket.on('mouse', mouseMsg);
+  socket.on("mouse", mouseMsg);
   socket.broudcast;
-  socket.on('disconnect', reason => {
+  socket.on("disconnect", reason => {
     console.log(reason);
   });
 
   function mouseMsg(data) {
-    socket.broadcast.emit('mouse', data);
+    socket.broadcast.emit("mouse", data);
     client.set(
       `${new Date().getTime()}_canvasData`,
       JSON.stringify(data),
-      'EX',
+      "EX",
       600,
       redis.print
     );
@@ -78,8 +78,8 @@ function newConnection(socket) {
  */
 
 server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+server.on("error", onError);
+server.on("listening", onListening);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -106,20 +106,20 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
+  if (error.syscall !== "listen") {
     throw error;
   }
 
-  var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
       process.exit(1);
       break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
       process.exit(1);
       break;
     default:
@@ -133,6 +133,6 @@ function onError(error) {
 
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  debug("Listening on " + bind);
 }
