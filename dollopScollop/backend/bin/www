@@ -46,6 +46,7 @@ function newConnection(socket) {
         }
 
         newCanvas.push(result);
+        console.log(newCanvas)
       });
     }
     socket.emit("newCanvas", newCanvas);
