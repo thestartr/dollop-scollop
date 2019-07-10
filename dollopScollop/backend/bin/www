@@ -36,6 +36,8 @@ io.on('connection', newConnection);
 
 function newConnection(socket) {
   console.log('New connection ' + socket.id);
+  var colour = '#' + (((1 << 24) * Math.random()) | 0).toString(16);
+  socket.emit('colour', colour);
   connectedUsers++;
   redisClient.keys('*', (err, keys) => {
     if (err) return console.log(err);
@@ -61,9 +63,19 @@ function newConnection(socket) {
     // console.log(newCanvas);
   });
 
-  // redisClient.flushdb(function (err, succeeded) {
-  //   console.log(succeeded); // will be true if successfull
-  // });
+  setInterval(() => {
+    clearCanvas();
+    flushRedis();
+  }, 60000);
+
+  function flushRedis() {
+    redisClient.flushdb(function(err, succeeded) {
+      console.log(succeeded); // will be true if successfull
+    });
+  }
+  function clearCanvas() {
+    socket.emit('clearRect', 'clearRect');
+  }
 
   socket.on('mouse', mouseMsg);
   socket.broudcast;
@@ -75,11 +87,10 @@ function newConnection(socket) {
 
   function mouseMsg(data) {
     socket.broadcast.emit('mouse', data);
+
     redisClient.set(
       `${new Date().getTime()}_canvasData`,
       JSON.stringify(data),
-      'EX',
-      600,
       redis.print
     );
   }

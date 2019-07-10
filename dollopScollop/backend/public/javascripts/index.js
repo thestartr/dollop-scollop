@@ -7,6 +7,8 @@
   let isDrawing = false;
   let mousePos = { x: 0, y: 0 };
   let lastPos = mousePos;
+  var colour;
+  socket.on('colour', data => (colour = data));
 
   // functions
   function createCanvas(parentContainer, canvasWidth, canvasHeight, canvasID) {
@@ -22,20 +24,16 @@
   socket.on('newCanvas', newCanvas);
 
   function newCanvas(data) {
-    // console.log(data);
     for (var i = 0; i < data.length; i++) {
       var parsed = JSON.parse(data[i]);
-      // console.log(parsed);
       newDrawing(parsed);
     }
   }
 
   socket.on('mouse', newDrawing);
   function newDrawing(data) {
-    console.log(data);
-    var colour = '#' + (((1 << 24) * Math.random()) | 0).toString(16);
     ctx.lineJoin = ctx.lineCap = 'round';
-    ctx.strokeStyle = colour;
+    ctx.strokeStyle = data.colour;
     ctx.beginPath();
     ctx.lineWidth = 10;
     if (data.prevX && data.prevY) {
@@ -56,7 +54,7 @@
 
   function getCanvasPosition(e) {
     isDrawing = true;
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 10;
     ctx.lineJoin = ctx.lineCap = 'round';
     lastPos = getMousePos(canvas, e);
   }
@@ -79,11 +77,12 @@
         x: mouseCoords.x,
         y: mouseCoords.y,
         prevX: lastPos.x,
-        prevY: lastPos.y
+        prevY: lastPos.y,
+        colour: colour
       };
 
       socket.emit('mouse', data);
-      ctx.strokeStyle = '#000';
+      ctx.strokeStyle = colour;
       ctx.beginPath();
       ctx.moveTo(lastPos.x, lastPos.y);
       ctx.lineTo(mouseCoords.x, mouseCoords.y);
@@ -109,12 +108,11 @@
   canvas.addEventListener('mousemove', mouseDragged);
   canvas.addEventListener('mouseup', () => (isDrawing = false));
 
-  setInterval(function() {
-    if (isCanvasBlank(canvas)) {
-      socket.emit('clearCanvas', 'clear');
-      //TODO: clear all canvases on screen. but check if other signals are coming through.
-    }
-  }, 3000);
+  socket.on('clearRect', clearCanvas);
+
+  function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
 })();
 
 //TODO: convert lineto to bezier curves
