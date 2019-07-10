@@ -7,26 +7,38 @@
   let isDrawing = false;
   let mousePos = { x: 0, y: 0 };
   let lastPos = mousePos;
+  var colour;
+  socket.on('colour', data => (colour = data));
 
   // functions
   function createCanvas(parentContainer, canvasWidth, canvasHeight, canvasID) {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', canvasID);
-    this.canvas.setAttribute('width', 1000);
-    this.canvas.setAttribute('height', 500);
+    this.canvas.setAttribute('width', window.innerWidth);
+    this.canvas.setAttribute('height', window.innerHeight);
     parentContainer.appendChild(this.canvas);
 
     return this.canvas;
   }
 
+  socket.on('newCanvas', newCanvas);
+
+  function newCanvas(data) {
+    for (var i = 0; i < data.length; i++) {
+      var parsed = JSON.parse(data[i]);
+      newDrawing(parsed);
+    }
+  }
+
   socket.on('mouse', newDrawing);
   function newDrawing(data) {
-    console.log(data);
     ctx.lineJoin = ctx.lineCap = 'round';
-    ctx.strokeStyle = '#' + (((1 << 24) * Math.random()) | 0).toString(16);
+    ctx.strokeStyle = data.colour;
     ctx.beginPath();
     ctx.lineWidth = 10;
-    ctx.moveTo(data.prevX, data.prevY);
+    if (data.prevX && data.prevY) {
+      ctx.moveTo(data.prevX, data.prevY);
+    }
     ctx.lineTo(data.x, data.y);
     ctx.stroke();
     // ctx.closePath();
@@ -42,9 +54,19 @@
 
   function getCanvasPosition(e) {
     isDrawing = true;
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 10;
     ctx.lineJoin = ctx.lineCap = 'round';
     lastPos = getMousePos(canvas, e);
+  }
+
+  function isCanvasBlank(canvas) {
+    const context = canvas.getContext('2d');
+
+    const pixelBuffer = new Uint32Array(
+      context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+    );
+
+    return pixelBuffer.every(color => color !== 0);
   }
 
   function mouseDragged(e) {
@@ -55,11 +77,12 @@
         x: mouseCoords.x,
         y: mouseCoords.y,
         prevX: lastPos.x,
-        prevY: lastPos.y
+        prevY: lastPos.y,
+        colour: colour
       };
 
       socket.emit('mouse', data);
-      ctx.strokeStyle = '#000';
+      ctx.strokeStyle = colour;
       ctx.beginPath();
       ctx.moveTo(lastPos.x, lastPos.y);
       ctx.lineTo(mouseCoords.x, mouseCoords.y);
@@ -74,8 +97,8 @@
   // create canvas & get context
   const canvas = new createCanvas(
     canvasContainer,
-    1000,
-    1000,
+    100,
+    100,
     'c-dollopScollp__canvas'
   );
   const ctx = canvas.getContext('2d');
@@ -84,6 +107,12 @@
   canvas.addEventListener('mousedown', getCanvasPosition);
   canvas.addEventListener('mousemove', mouseDragged);
   canvas.addEventListener('mouseup', () => (isDrawing = false));
+
+  socket.on('clearRect', clearCanvas);
+
+  function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
 })();
 
 //TODO: convert lineto to bezier curves

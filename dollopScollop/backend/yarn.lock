@@ -69,6 +69,16 @@ asap@~1.0.0:
   resolved "https://registry.yarnpkg.com/asap/-/asap-1.0.0.tgz#b2a45da5fdfa20b0496fc3768cc27c12fa916a7d"
   integrity sha1-sqRdpf36ILBJb8N2jMJ8EvqRan0=
 
+async@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/async/-/async-3.1.0.tgz#42b3b12ae1b74927b5217d8c0016baaf62463772"
+  integrity sha512-4vx/aaY6j/j3Lw3fbCHNWP0pPaTCew3F6F3hYyl/tHs/ndmV1q7NW9T5yuJ2XAGwdQrP+6Wu20x06U4APo/iQQ==
+
+aysnc@^0.0.1-security:
+  version "0.0.1-security"
+  resolved "https://registry.yarnpkg.com/aysnc/-/aysnc-0.0.1-security.tgz#a94b2f01d4b54bd2e86508e025fd01513bc873d6"
+  integrity sha512-sYBudonLYwlhaoFlnGfpHWVzUv4FCG8FaNZBjEpkQUwCZf3VjEaVB0/YAmuHekss3mdWl94656oBlpGiY1KKWQ==
+
 backo2@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/backo2/-/backo2-1.0.2.tgz#31ab1ac8b129363463e35b3ebb69f4dfcfba7947"

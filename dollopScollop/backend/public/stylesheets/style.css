@@ -9,8 +9,34 @@ body {
   height:100vh;
 }
 
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-align: left;
+  /* background: #eee; */
+  padding: 1rem;
+  user-select: none; /* supported by Chrome and Opera */
+   -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+   -moz-user-select: none; /* Firefox */
+   -ms-user-select: none; /* Internet Explorer/Edge */
+   pointer-events: none;
+}
+
+header h1 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+header
+p {
+  font-size: 0.6rem;
+  margin: 0.2rem 0;
+}
+
 .wrapper {
-  max-width: 1000px;
+  /* max-width: 1000px; */
   margin: 0 auto;
   text-align: center;
 }
