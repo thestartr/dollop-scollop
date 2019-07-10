@@ -29,9 +29,10 @@ header h1 {
   margin: 0;
 }
 
-header p {
+header
+p {
   font-size: 0.6rem;
-  margin: 0.2rem;
+  margin: 0 0.2rem;
 }
 
 .wrapper {
