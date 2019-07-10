@@ -6,6 +6,8 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "async": "^3.1.0",
+    "aysnc": "^0.0.1-security",
     "bluebird": "^3.5.5",
     "connect-redis": "^3.4.1",
     "cookie-parser": "~1.4.4",

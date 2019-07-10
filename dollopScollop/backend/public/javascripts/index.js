@@ -12,8 +12,8 @@
   function createCanvas(parentContainer, canvasWidth, canvasHeight, canvasID) {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', canvasID);
-    this.canvas.setAttribute('width', 1000);
-    this.canvas.setAttribute('height', 500);
+    this.canvas.setAttribute('width', window.innerWidth);
+    this.canvas.setAttribute('height', window.innerHeight);
     parentContainer.appendChild(this.canvas);
 
     return this.canvas;
@@ -22,17 +22,25 @@
   socket.on('newCanvas', newCanvas);
 
   function newCanvas(data) {
-    console.log(data);
+    // console.log(data);
+    for (var i = 0; i < data.length; i++) {
+      var parsed = JSON.parse(data[i]);
+      // console.log(parsed);
+      newDrawing(parsed);
+    }
   }
 
   socket.on('mouse', newDrawing);
   function newDrawing(data) {
-    // console.log(data);
+    console.log(data);
+    var colour = '#' + (((1 << 24) * Math.random()) | 0).toString(16);
     ctx.lineJoin = ctx.lineCap = 'round';
-    ctx.strokeStyle = '#' + (((1 << 24) * Math.random()) | 0).toString(16);
+    ctx.strokeStyle = colour;
     ctx.beginPath();
     ctx.lineWidth = 10;
-    ctx.moveTo(data.prevX, data.prevY);
+    if (data.prevX && data.prevY) {
+      ctx.moveTo(data.prevX, data.prevY);
+    }
     ctx.lineTo(data.x, data.y);
     ctx.stroke();
     // ctx.closePath();
