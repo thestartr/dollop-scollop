@@ -6,12 +6,12 @@ I created this to expreiment with websockets using Socket io updating all client
 
 ### Technology used
 Backend:
-Node.js with Express
-Socket.io
+Node.js with Express,
+Socket.io,
 Redis hosted on Azure
 
 Front end:
-HTML
-CSS
-Vanilla Js
+HTML,
+CSS,
+Vanilla Js,
 Canvas API
