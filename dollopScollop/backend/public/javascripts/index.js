@@ -3,12 +3,28 @@
 
   const canvasContainer = document.querySelector('.c-dollopScollop__container');
   // const ctx = canvas.getContext('2d');
-  const socket = io();
+  // const socket = io();
   let isDrawing = false;
   let mousePos = { x: 0, y: 0 };
   let lastPos = mousePos;
-  var colour;
-  socket.on('colour', data => (colour = data));
+  var colour = '';
+
+  const socketWorker = new Worker('./javascripts/socketWorker.js');
+
+  socketWorker.onmessage = e => {
+    switch (e.data.action) {
+      case 'SET_COLOUR':
+        return (colour = e.data.data);
+      case 'NEW_CANVAS':
+        return newCanvas(e.data.data);
+      case 'CONECTION_DRAWING':
+        return newDrawing(e.data.data);
+      case 'CLEAR_RECT':
+        return clearCanvas(e.data.data);
+      default:
+        return '';
+    }
+  };
 
   // functions
   function createCanvas(parentContainer, canvasWidth, canvasHeight, canvasID) {
@@ -21,16 +37,15 @@
     return this.canvas;
   }
 
-  socket.on('newCanvas', newCanvas);
-
   function newCanvas(data) {
+    // let reversedData = data.reverse();
+
     for (var i = 0; i < data.length; i++) {
       var parsed = JSON.parse(data[i]);
       newDrawing(parsed);
     }
   }
 
-  socket.on('mouse', newDrawing);
   function newDrawing(data) {
     ctx.lineJoin = ctx.lineCap = 'round';
     ctx.strokeStyle = data.colour;
@@ -81,7 +96,11 @@
         colour: colour
       };
 
-      socket.emit('mouse', data);
+      socketWorker.postMessage({
+        action: 'STORE_MOUSE',
+        data: data
+      });
+
       ctx.strokeStyle = colour;
       ctx.beginPath();
       ctx.moveTo(lastPos.x, lastPos.y);
@@ -108,10 +127,11 @@
   canvas.addEventListener('mousemove', mouseDragged);
   canvas.addEventListener('mouseup', () => (isDrawing = false));
 
-  socket.on('clearRect', clearCanvas);
-
-  function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function clearCanvas(data) {
+    if (data === 'clearRect') {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      console.log('got the clear signal', data);
+    }
   }
 })();
 

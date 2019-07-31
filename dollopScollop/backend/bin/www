@@ -18,6 +18,12 @@ var redisClient = redis.createClient(
 );
 
 /**
+ * Get Helper Functions.
+ */
+
+var setIntervalX = require('../public/javascripts/helpers').setIntervalX;
+
+/**
  * Get port from environment and store in Express.
  */
 
@@ -63,19 +69,37 @@ function newConnection(socket) {
     // console.log(newCanvas);
   });
 
-  setInterval(() => {
-    clearCanvas();
-    flushRedis();
-  }, 60000);
-
   function flushRedis() {
     redisClient.flushdb(function(err, succeeded) {
-      console.log(succeeded); // will be true if successfull
+      if (err) return;
+      console.log('Redis clearing status: ', succeeded); // will be true if successfull
     });
   }
   function clearCanvas() {
     socket.emit('clearRect', 'clearRect');
   }
+
+  setIntervalX(
+    () => {
+      async.parallel(
+        [
+          function(callback) {
+            clearCanvas();
+            console.log('here clearing canvas');
+          },
+          function(callback) {
+            flushRedis();
+            console.log('here flushing redis');
+          }
+        ],
+        function(err, results) {
+          console.log('results', results);
+        }
+      );
+    },
+    60000,
+    -1
+  );
 
   socket.on('mouse', mouseMsg);
   socket.broudcast;
